@@ -35,5 +35,5 @@ opc_normalization_factor:15//其值越大，动态物体更容易被识别
 
 #Cluster tracking prameters
 volume_constraint:0.3 //控制前后两帧各对应聚类点云体积是否相近,其值越大，容忍体积差距越大
-leave_off_distance:0.5
-catch_up_distance:0.3//影响
+leave_off_distance:0.5 //影响置信度更新时质心动静判断
+catch_up_distance:0.3//影响更新缓存时质心匹配

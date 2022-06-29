@@ -27,6 +27,7 @@ void moving_object_test(const sensor_msgs::PointCloud2ConstPtr& input)
 	}
 
   std::cout<<1000.0*(clock()-begin_time)/CLOCKS_PER_SEC<<std::endl;
+
   std::cout<<"-----------------------------------------------------\n";
 }
 

@@ -4,7 +4,7 @@
 
 ////////////////////////////////////////////////////////////////////Helping Methods
 
-//0.4函数生成边界框可视化
+//函数生成边界框可视化
 visualization_msgs::Marker mark_cluster(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_cluster, 
 int id, std::string f_id, std::string ns="bounding_box", float r=0.5, float g=0.5, float b=0.5)
 {
@@ -59,6 +59,7 @@ int id, std::string f_id, std::string ns="bounding_box", float r=0.5, float g=0.
   return marker;
 }
 
+//函数生成边界框可视化
 visualization_msgs::Marker mark_cluster2(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_cluster, 
 int id, std::string f_id,int colour){
   
@@ -318,8 +319,8 @@ void MovingObjectDetectionCloud::computeClusters(float distance_threshold, std::
 	#endif
   /*initialize and clear the required variables*/
 
-    static double start, time_taken,end;
-    start = ros::Time::now().toSec();
+    //static double start, time_taken,end;
+    //start = ros::Time::now().toSec();
   	/* //TEST1 基于欧式距离提取集群的方法
     pcl::EuclideanClusterExtraction<pcl::PointXYZI> ec;
     string s_method = "EuclideanClusterExtraction:     ";
@@ -330,15 +331,15 @@ void MovingObjectDetectionCloud::computeClusters(float distance_threshold, std::
   	ec.extract(cluster_indices);   */
 	/*euclidian clustering*/
     
-    /*//TEST2 基于联通组件的聚类方法
+    //TEST2 基于联通组件的聚类方法
     componentClustering(cloud,cluster_indices);
-    string s_method = "2.5D component_clustering:     ";   */
+    string s_method = "2.5D component_clustering:     ";   
 
   /* //TEST3 原始DBSCAN聚类方法
     DBSCAN_Clustering(cloud,cluster_indices);//
     string s_method = "DBSCAN_clustering:     ";    */
 
-  //TEST4 KDTree加速的DBSCAN聚类方法
+  /* //TEST4 KDTree加速的DBSCAN聚类方法
     string s_method = "DBSCAN_KDTree_clustering:     ";   
     pcl::PointCloud<pcl::PointXYZ>::Ptr keypoints_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     for(int i = 0;i<cloud->points.size();i++){
@@ -358,14 +359,14 @@ void MovingObjectDetectionCloud::computeClusters(float distance_threshold, std::
     ec.setMaxClusterSize(25000);//最大聚类点数
     ec.setSearchMethod(tree);//输入树
     ec.setInputCloud(keypoints_ptr);//输入点云
-    ec.extract(cluster_indices);//输出存储索引
+    ec.extract(cluster_indices);//输出存储索引 */
 
-    end = ros::Time::now().toSec();
+    /* end = ros::Time::now().toSec();
     time_taken = end - start;
     ofstream time_txt("/home/wyw/clustering_time.txt", std::ios::app);
     time_txt<<"Frame"<<+"\n";
     time_txt<<s_method<<time_taken<<+"\n";
-    time_txt.close(); 
+    time_txt.close();  */
   
 
   	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
@@ -451,7 +452,7 @@ void MovingObjectDetectionMethods::calculateCorrespondenceCentroid(
   corr_est.setInputSource(fp);
   corr_est.setInputTarget(fc);
 	corr_est.determineReciprocalCorrespondences(*ufmp);
-   //类CorrespondenceEstimation是确定目标和查询点集(或特征)之间的对应关系的基类
+  //类CorrespondenceEstimation是确定目标和查询点集(或特征)之间的对应关系的基类
   //输出两组点云之间对应点集合
   /*euclidian distance based reciprocal correspondence (one to one correspondence)
   基于欧几里得距离的相互对应（一对一对应*/
@@ -852,14 +853,21 @@ void MovingObjectRemoval::pushRawCloudAndPose(pcl::PCLPointCloud2 &in_cloud,geom
   //显示速度
   showV(ca->centroid_collection,cb->centroid_collection,mp,cb->detection_results);
 
-
 	checkMovingClusterChain(mp,ca->detection_results,cb->detection_results);
   /*submit the results to update the buffers
   提交结果以更新缓冲区*/
+    /* static double start, time_taken,end;
+    start = ros::Time::now().toSec();
+    end = ros::Time::now().toSec();
+    time_taken = end - start;
+    ofstream time_txt("/home/wyw/checkMovingClusterChain.txt", std::ios::app);
+    time_txt<<"Frame"<<+"\n";
+    time_txt<<time_taken<<+"\n";
+    time_txt.close();   */
   }
 }
 
-//0.3 从mo_ec中移除静态聚类对象，在最新点云中移除移动动态物体，output输出过滤后的点云 
+//10 从mo_ec中移除静态聚类对象，在最新点云中移除移动动态物体，output输出过滤后的点云 
 bool MovingObjectRemoval::filterCloud(pcl::PCLPointCloud2 &out_cloud,std::string f_id)
 {
   /*removes the moving objects from the latest pointcloud and puts the filtered cloud in 'output'.
@@ -942,15 +950,6 @@ bool MovingObjectRemoval::filterCloud(pcl::PCLPointCloud2 &out_cloud,std::string
 			#endif
     }
   }  
-
-  //输出所有聚类
-  /* float rd02=0,gd02=1.0,bd02=0;
-  int id02 = 100;
-  for (int i = 0; i < cb->clusters.size(); i++)
-  {
-		marker2_pub.publish(mark_cluster(cb->clusters[i],id02,debug_fid,"All_box",rd02,gd02,bd02));
-  } */
-  
 
 
   pcl::PointCloud<pcl::PointXYZI>::Ptr f_cloud(new pcl::PointCloud<pcl::PointXYZI>);
